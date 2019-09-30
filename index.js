@@ -15,14 +15,14 @@ io.on("connection", socket => {
 
   if (!clientMap.has(id)) {
     let s = new Set()
-    clientMap.set(s)
+    clientMap.set(id, s)
   }
 
   clientMap.get(id).add(socket)
-  socket.on("disconnected", clientMap.get(id).delete(socket))
+  socket.on("disconnected", () => clientMap.get(id).delete(socket))
   socket.on("message", (targetId, message) => {
     for (let soc of clientMap.get(targetId) || []) {
-      soc.send("message", id, message)
+      soc.send(id, message)
     }
   })
 })
