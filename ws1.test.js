@@ -2,7 +2,7 @@ let socketio = require("socket.io-client")
 
 
 
-let con1 = socketio.connect("http://localhost:8080", {
+let con1 = socketio.connect("https://beo-wssignal.herokuapp.com/", {
   query: { id: "1" }
 })
 
