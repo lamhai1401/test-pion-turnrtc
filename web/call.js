@@ -141,7 +141,10 @@ class WebRTCCallPair {
                 offerToReceiveVideo: true,
             })
 
+            offer.sdp = sdpTransform(offer.sdp)
+            
             await this.pc.setLocalDescription(offer)
+
             this.signal(this.pc.localDescription)
         }
         this.unlock()
@@ -159,8 +162,16 @@ class WebRTCCallPair {
             for (const track of this.outStream.getTracks())
                 this.pc.addTrack(track);
             await this.pc.setRemoteDescription(data)
-            let answer = await this.pc.createAnswer()
+            let answer = await this.pc.createAnswer({
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: true
+            })
+
+            answer.sdp = sdpTransform(answer.sdp)
+
+
             await this.pc.setLocalDescription(answer)
+
             this.signal(this.pc.localDescription)
         }
         this.unlock()
