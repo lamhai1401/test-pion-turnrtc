@@ -7,7 +7,7 @@ var iceConnectionLog = document.getElementById('ice-connection-state'),
 var id = ((0x10000) * Math.random() | 0).toString(16)
 var broadcastId = ""
 
-let wsSignal = new WebSocket(`ws://localhost:8080?id=${id}`)
+let wsSignal = new WebSocket(`wss://beo-wsnative.herokuapp.com?id=${id}`)
 
 
 id_viewer.textContent += id
@@ -28,11 +28,13 @@ var pc = new RTCPeerConnection(config)
 pc.addEventListener('icegatheringstatechange', function () {
     iceGatheringLog.textContent += ' -> ' + pc.iceGatheringState;
 }, false);
+
 iceGatheringLog.textContent = pc.iceGatheringState;
 
 pc.addEventListener('iceconnectionstatechange', function () {
     iceConnectionLog.textContent += ' -> ' + pc.iceConnectionState;
 }, false);
+
 iceConnectionLog.textContent = pc.iceConnectionState;
 
 pc.addEventListener('signalingstatechange', function () {

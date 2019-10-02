@@ -7,7 +7,7 @@ var iceConnectionLog = document.getElementById('ice-connection-state'),
 var id = ((0x10000) * Math.random() | 0).toString(16)
 var viewerId = ""
 
-let wsSignal = new WebSocket(`ws://localhost:8080?id=${id}`)
+let wsSignal = new WebSocket(`wss://beo-wsnative.herokuapp.com/?id=${id}`)
 
 id_broadcast.textContent += id
 
@@ -39,12 +39,12 @@ iceConnectionLog.textContent = pc.iceConnectionState;
 pc.addEventListener('signalingstatechange', function () {
     signalingLog.textContent += ' -> ' + pc.signalingState;
 }, false);
+
 signalingLog.textContent = pc.signalingState;
 
 pc.onicecandidate = function (event) {
     console.log("Send ICE candidate !!!")
     if (event.candidate) {
-        // console.log("Send ICE candidate !!!", event)
         wsSignal.send(JSON.stringify([viewerId, { candidate: event.candidate }]))
     } else {
         console.log(event)
@@ -78,7 +78,7 @@ wsSignal.onmessage = async event => {
             console.log("Send Offers !!!")
 
         } else if (data.sdp) {
-            
+
             document.getElementById('answer-sdp').textContent = data.sdp;
             await pc.setRemoteDescription(data)
 
