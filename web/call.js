@@ -125,7 +125,9 @@ class WebRTCCallPair {
     }
 
     async start() {
+        await this.lock()
         if (this.initiator) {
+
             await this.initOutStream()
 
             for (const track of this.outStream.getTracks())
@@ -134,15 +136,17 @@ class WebRTCCallPair {
             let offer = await this.pc.createOffer({
                 offerToReceiveAudio: true,
                 offerToReceiveVideo: true,
-                iceRestart: true,
             })
 
             await this.pc.setLocalDescription(offer)
             this.signal(this.pc.localDescription)
         }
+        this.unlock()
     }
 
     async onSDP(data) {
+        await this.lock()
+
         console.log("onSDP")
         if (this.initiator) {
             await this.pc.setRemoteDescription(data)
@@ -156,13 +160,15 @@ class WebRTCCallPair {
             await this.pc.setLocalDescription(answer)
             this.signal(this.pc.localDescription)
         }
+        this.unlock()
     }
 
     async onCandidate(data) {
         try {
-            if (data.candidate){
-
+            if (data.candidate) {
+                await this.lock()
                 await this.pc.addIceCandidate(data.candidate)
+                this.unlock()
             }
         } catch (error) {
             console.error({ data, error })
@@ -185,5 +191,6 @@ let callrtc = new WebRTCCall(id)
 function doCall() {
     let callId = id_caller.value
     callrtc.start(callId)
+        .catch(e => alert(JSON.stringify(e)))
 }
 
