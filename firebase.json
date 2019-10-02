@@ -1,0 +1,19 @@
+{
+  "hosting": {
+    "public": "web",
+    "target": "test-rtc-2",
+    "ignore": [
+      "firebase.json",
+      "package.json",
+      "package-lock.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

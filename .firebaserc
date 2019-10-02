@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "test-rtc-2": "livestreaming-241004"
+  },
+  "targets": {
+    "livestreaming-241004": {
+      "hosting": {
+        "test-rtc-2": [
+          "test-rtc-2"
+        ]
+      }
+    }
+  }
+}

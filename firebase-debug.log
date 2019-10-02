@@ -1,0 +1,13 @@
+[debug] [2019-10-02T06:58:21.243Z] ----------------------------------------------------------------------
+[debug] [2019-10-02T06:58:21.244Z] Command:       /usr/bin/node /usr/bin/firebase deploy --project livestreaming-241004
+[debug] [2019-10-02T06:58:21.244Z] CLI Version:   6.5.0
+[debug] [2019-10-02T06:58:21.244Z] Platform:      linux
+[debug] [2019-10-02T06:58:21.244Z] Node Version:  v12.10.0
+[debug] [2019-10-02T06:58:21.245Z] Time:          Wed Oct 02 2019 13:58:21 GMT+0700 (Indochina Time)
+[debug] [2019-10-02T06:58:21.245Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-10-02T06:58:21.249Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-10-02T06:58:21.249Z] > authorizing via signed-in user
+[debug] [2019-10-02T06:58:21.249Z] [iam] checking project livestreaming-241004 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2019-10-02T06:58:21.250Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/livestreaming-241004:testIamPermissions  
+
