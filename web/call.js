@@ -1,8 +1,9 @@
-var iceConnectionLog = document.getElementById('ice-connection-state'),
-    iceGatheringLog = document.getElementById('ice-gathering-state'),
-    id_viewer = document.getElementById('your-id'),
-    id_caller = document.getElementById('call-id'),
-    signalingLog = document.getElementById('signaling-state');
+//@ts-check
+let iceConnectionLog = document.getElementById('ice-connection-state')
+let iceGatheringLog = document.getElementById('ice-gathering-state')
+let id_viewer = document.getElementById('your-id')
+let id_caller = document.getElementById('call-id')
+let signalingLog = document.getElementById('signaling-state')
 
 var id = ((10000) * Math.random() | 0).toString()
 var broadcastId = ""
@@ -31,6 +32,8 @@ class WebRTCCall {
             let [channel, data] = JSON.parse(event.data)
             this.onSocketMessage(channel, data)
         }
+
+        // setInterval(() => {})
 
         /**@type {Map<string,WebRTCCallPair>} */
         this.call = new Map()
@@ -103,8 +106,6 @@ class WebRTCCallPair {
 
         this.pc.addEventListener('signalingstatechange', () => {
             console.log("[WebRTCCall] signalingstatechange", this.callId, this.pc.signalingState)
-            if (this.pc.signalingstatechange == "stable")
-                this.stableResolve()
         }, false);
     }
 
@@ -118,13 +119,18 @@ class WebRTCCallPair {
         this.inStream = new MediaStream();
         this.videoElement.srcObject = this.inStream
         this.pc.ontrack = ev => this.inStream.addTrack(ev.track);
-        this.stableState = new Promise(r => this.stableResolve = r)
         document.body.appendChild(this.videoElement)
     }
 
+
     async initOutStream() {
+        console.trace("[initOutStream]")
         this.outStream = await navigator.mediaDevices
             .getUserMedia({ video: true, audio: true });
+        for (const track of this.outStream.getTracks()){
+            let rtp = this.pc.addTrack(track);
+            
+        }
     }
 
     async start() {
@@ -133,16 +139,11 @@ class WebRTCCallPair {
 
             await this.initOutStream()
 
-            for (const track of this.outStream.getTracks())
-                this.pc.addTrack(track);
-
             let offer = await this.pc.createOffer({
                 offerToReceiveAudio: true,
                 offerToReceiveVideo: true,
             })
 
-            offer.sdp = sdpTransform(offer.sdp)
-            
             await this.pc.setLocalDescription(offer)
 
             this.signal(this.pc.localDescription)
@@ -159,15 +160,11 @@ class WebRTCCallPair {
         } else {
             await this.initOutStream()
 
-            for (const track of this.outStream.getTracks())
-                this.pc.addTrack(track);
             await this.pc.setRemoteDescription(data)
             let answer = await this.pc.createAnswer({
                 offerToReceiveAudio: true,
                 offerToReceiveVideo: true
             })
-
-            answer.sdp = sdpTransform(answer.sdp)
 
 
             await this.pc.setLocalDescription(answer)
