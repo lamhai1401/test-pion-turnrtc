@@ -95,15 +95,17 @@ class WebRTCCallPair {
 
     initDebug() {
         this.pc.addEventListener('icegatheringstatechange', () => {
-
+            iceGatheringLog.innerText += `-> ${this.pc.iceGatheringState}`
             console.log("[WebRTCCall] icegatheringstatechange", this.callId, this.pc.iceGatheringState)
         }, false);
 
         this.pc.addEventListener('iceconnectionstatechange', () => {
+            iceConnectionLog.innerText += `-> ${this.pc.iceConnectionState}`
             console.log("[WebRTCCall] iceconnectionstatechange", this.callId, this.pc.iceConnectionState)
         }, false);
 
         this.pc.addEventListener('signalingstatechange', () => {
+            signalingLog.innerText += `-> ${this.pc.signalingState}`
             console.log("[WebRTCCall] signalingstatechange", this.callId, this.pc.signalingState)
         }, false);
     }
@@ -112,12 +114,19 @@ class WebRTCCallPair {
         this.videoElement = document.createElement("video")
         this.videoElement.id = "call-" + this.callId
         this.videoElement.playsInline = true
-        this.videoElement.autoplay = true
+        // this.videoElement.autoplay = true
         this.videoElement.muted = true
         this.videoElement.controls = true
-        this.inStream = new MediaStream();
-        this.videoElement.srcObject = this.inStream
-        this.pc.ontrack = ev => this.inStream.addTrack(ev.track);
+        // this.inStream = new MediaStream();
+        // this.videoElement.srcObject = this.inStream
+        // this.videoElement.addEventListener(
+        //     "loadedmetadata",
+        //     () => this.videoElement.play()
+        // )
+        this.pc.ontrack = ev => {
+            this.videoElement.srcObject = ev.streams[0]
+            // this.inStream.addTrack(ev.track);
+        }
         document.body.appendChild(this.videoElement)
     }
 
@@ -127,7 +136,7 @@ class WebRTCCallPair {
         this.outStream = await navigator.mediaDevices
             .getUserMedia({ video: true, audio: true });
         for (const track of this.outStream.getTracks()){
-            let rtp = this.pc.addTrack(track);
+            let rtp = this.pc.addTrack(track, this.outStream);
             
         }
     }
@@ -139,8 +148,8 @@ class WebRTCCallPair {
             await this.initOutStream()
 
             let offer = await this.pc.createOffer({
-                offerToReceiveAudio: true,
-                offerToReceiveVideo: true,
+                offerToReceiveAudio: 1,
+                offerToReceiveVideo: 1,
             })
 
             await this.pc.setLocalDescription(offer)
@@ -161,8 +170,8 @@ class WebRTCCallPair {
 
             await this.pc.setRemoteDescription(data)
             let answer = await this.pc.createAnswer({
-                offerToReceiveAudio: true,
-                offerToReceiveVideo: true
+                offerToReceiveAudio: 1,
+                offerToReceiveVideo: 1
             })
 
 
