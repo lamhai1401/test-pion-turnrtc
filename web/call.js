@@ -12,10 +12,9 @@ id_viewer.textContent += id
 
 var config = {
     sdpSemantics: 'unified-plan',
+    rtcpMuxPolicy: "require",
+    bundlePolicy: "max-bundle",
     iceServers: [
-        {
-            urls: ['stun:stun.l.google.com:19302']
-        },
         {
             urls: ["turn:35.247.173.254:3478"],
             username: "username",
