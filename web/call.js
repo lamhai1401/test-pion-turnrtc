@@ -114,7 +114,7 @@ class WebRTCCallPair {
         this.videoElement = document.createElement("video")
         this.videoElement.id = "call-" + this.callId
         this.videoElement.playsInline = true
-        // this.videoElement.autoplay = true
+        this.videoElement.autoplay = true
         this.videoElement.muted = true
         this.videoElement.controls = true
         // this.inStream = new MediaStream();
