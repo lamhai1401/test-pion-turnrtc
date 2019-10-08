@@ -8,6 +8,18 @@ let signalingLog = document.getElementById('signaling-state')
 var id = ((10000) * Math.random() | 0).toString()
 var broadcastId = ""
 
+function getTURNCredentials(name, secret){    
+
+    var unixTimeStamp = parseInt(Date.now()/1000) + 24*3600,   // this credential would be valid for the next 24 hours
+        username = [unixTimeStamp, name].join(':');
+    return {
+        username: username,
+        credential: CryptoJS.HmacSHA1(username, secret).toString(CryptoJS.enc.Base64)
+    };
+  }
+  
+  
+
 id_viewer.textContent += id
 
 var config = {
@@ -20,14 +32,8 @@ var config = {
         },
         {
             urls: ["turn:35.247.173.254"],
-            username: "username",
-            credential: "password"
+            ...getTURNCredentials("username","3575819665154b268af59efedee8826e")
         },
-        {
-            urls: ["turn:35.234.206.137"],
-            username: "username",
-            credential: "password"
-        }
     ]
 };
 

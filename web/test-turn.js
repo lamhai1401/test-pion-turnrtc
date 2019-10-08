@@ -28,10 +28,22 @@ function checkTURNServer(turnConfig, timeout){
   });   
 }
   
+function getTURNCredentials(name, secret){    
+
+  var unixTimeStamp = parseInt(Date.now()/1000) + 24*3600,   // this credential would be valid for the next 24 hours
+      username = [unixTimeStamp, name].join(':');
+  return {
+      username: username,
+      credential: CryptoJS.HmacSHA1(username, secret).toString(CryptoJS.enc.Base64)
+  };
+}
+
+
+console.log(getTURNCredentials("username","3575819665154b268af59efedee8826e"))
+
 checkTURNServer({
     urls : 'turn:35.247.173.254',
-    username: 'username',
-    credential: 'password'
+    ...getTURNCredentials("username","3575819665154b268af59efedee8826e")
 }).then(function(bool){
     console.log('is my TURN server active? ', bool? 'yes':'no');
 }).catch(console.error.bind(console));
