@@ -16,6 +16,9 @@ var config = {
     bundlePolicy: "max-bundle",
     iceServers: [
         {
+            urls: ['stun:35.247.173.254']
+        },
+        {
             urls: ["turn:35.247.173.254:3478"],
             username: "username",
             credential: "password"
