@@ -19,7 +19,7 @@ var config = {
             urls: ['stun:35.247.173.254']
         },
         {
-            urls: ["turn:35.247.173.254:3478"],
+            urls: ["turn:35.247.173.254"],
             username: "username",
             credential: "password"
         }
