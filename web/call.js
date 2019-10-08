@@ -22,6 +22,11 @@ var config = {
             urls: ["turn:35.247.173.254"],
             username: "username",
             credential: "password"
+        },
+        {
+            urls: ["turn:35.234.206.137"],
+            username: "username",
+            credential: "password"
         }
     ]
 };
