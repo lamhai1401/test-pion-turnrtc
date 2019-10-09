@@ -22,6 +22,7 @@ function getTURNCredentials(name, secret) {
 
 id_viewer.textContent += id
 
+
 var config = {
     sdpSemantics: 'unified-plan',
     rtcpMuxPolicy: "require",
@@ -34,7 +35,7 @@ var config = {
             urls: ["turn:35.247.173.254"],
             ...getTURNCredentials("username", "3575819665154b268af59efedee8826e")
         },
-    ]
+    ],
 };
 
 class WebRTCCall {
@@ -148,7 +149,10 @@ class WebRTCCallPair {
     async initOutStream() {
         console.trace("[initOutStream]")
         this.outStream = await navigator.mediaDevices
-            .getUserMedia({ video: true, audio: true });
+            .getUserMedia({
+                audio: true,
+                video: true
+            });
         for (const track of this.outStream.getTracks()) {
             let rtp = this.pc.addTrack(track, this.outStream);
 

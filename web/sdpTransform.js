@@ -1,3 +1,4 @@
+
 function convert_str_to_list(sdp_string, character) {
     return sdp_string.split(character)
 }
@@ -96,25 +97,47 @@ function sdp_filter(sdp_raw, engine) {
     let engine_number2 = parseInt(engine_number) + 1
     return new_sdp.replace(new RegExp(engine_number2 + "", 'g'), 97)
 }
+
+function IsSafari() {
+    var ua = navigator.userAgent.toLowerCase();
+    if (ua.indexOf('safari') != -1) {
+        if (ua.indexOf('chrome') > -1) {
+            return false
+        } else {
+            return true
+        }
+    }
+}
+
+
 const params = {
     audioSendBitrate: undefined,
     audioSendCodec: undefined,
+    // audioSendCodec: IsSafari() ? "AAC" : "OPUS",
     audioRecvBitrate: undefined,
     audioRecvCodec: undefined,
     opusMaxPbr: undefined,
     opusFec: undefined,
     opusDtx: undefined,
     opusStereo: undefined,
-    videoSendBitrate: undefined,
+    videoSendBitrate: 1024000,
     videoSendInitialBitrate: undefined,
-    videoSendCodec: undefined,
-    videoRecvBitrate: undefined,
+    videoSendCodec: IsSafari() ? "H264" : "VP8",
+    videoRecvBitrate: 1024000,
     videoRecvCodec: "VP8",
     videoFec: undefined,
-    mediaConstraints: {
-        audio: true, video: true
-    }
 }
+
+
+try {
+    document.getElementsByTagName("pre")[0].textContent = JSON.stringify({
+        codec: params.videoSendCodec,
+        IsSafari: IsSafari()
+    },null,2)
+} catch (error) {
+
+}
+
 const sdpTransform = (sdp) => {
     try {
         sdp = maybeSetOpusOptions(sdp, params);
