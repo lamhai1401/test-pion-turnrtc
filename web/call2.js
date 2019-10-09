@@ -28,10 +28,10 @@ var config = {
     bundlePolicy: "max-bundle",
     iceServers: [
         {
-            urls: ['stun:35.247.173.254']
+            urls: ['stun:104.155.194.70']
         },
         {
-            urls: ["turn:35.247.173.254"],
+            urls: ["turn:104.155.194.70"],
             ...getTURNCredentials("username", "3575819665154b268af59efedee8826e")
         },
     ]
