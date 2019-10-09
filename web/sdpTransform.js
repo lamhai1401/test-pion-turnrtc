@@ -109,6 +109,9 @@ function IsSafari() {
     }
 }
 
+var sendCodecs = document.getElementById("sendCodecs");
+var sendCodecs = document.getElementById("sendCodecs");
+var bitrate = document.getElementById("bitrate");
 
 const params = {
     audioSendBitrate: undefined,
@@ -121,13 +124,28 @@ const params = {
     opusDtx: undefined,
     opusStereo: undefined,
     videoSendBitrate: 1024000,
-    videoSendInitialBitrate: undefined,
+    videoSendInitialBitratoptionse: undefined,
     videoSendCodec: IsSafari() ? "H264" : "VP8",
     videoRecvBitrate: 1024000,
     videoRecvCodec: "VP8",
     videoFec: undefined,
 }
 
+recvCodecs.addEventListener("change", () => {
+    params.videoRecvCodec = recvCodecs.options[recvCodecs.selectedIndex].value;
+    console.log(params)
+});
+
+sendCodecs.addEventListener("change", () => {
+    params.videoSendCodec = sendCodecs.options[sendCodecs.selectedIndex].value;
+    console.log(params)
+});
+
+bitrate.addEventListener("change", () => {
+    params.videoRecvBitrate = bitrate.options[bitrate.selectedIndex].value;
+    params.videoSendBitrate = bitrate.options[bitrate.selectedIndex].value;
+    console.log(params)
+});
 
 try {
     document.getElementsByTagName("pre")[0].textContent = JSON.stringify({

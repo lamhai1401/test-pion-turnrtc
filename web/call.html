@@ -29,6 +29,28 @@
     <br>
     <button type="submit" onclick="doCall()">Join</button>
 
+    <br> Select Send Codecs
+    <select id="sendCodecs">
+        <option value="VP8" autofocus>VP8</option>
+        <option value="VP9">VP9</option>
+        <option value="H264">H264</option>
+    </select>
+
+    <br> Select Recv Codecs
+    <select id="recvCodecs">
+        <option value="VP8" autofocus>VP8</option>
+        <option value="VP9">VP9</option>
+        <option value="H264">H264</option>
+    </select>
+
+    <br> Bitrate
+    <select id="bitrate">
+        <option value="128000" autofocus>128</option>
+        <option value="256000">256</option>
+        <option value="512000">512</option>
+        <option value="1024000">1024</option>
+    </select>
+
     Video<br />
     <audio id="audio" autoplay="true"></audio>
     <video id="video" autoplay="true" playsinline="true"></video>
