@@ -166,6 +166,8 @@ class WebRTCCallPair {
                 offerToReceiveVideo: 1,
             })
 
+            offer.sdp = sdpTransform(offer.sdp)
+
             await this.pc.setLocalDescription(offer)
 
             this.signal(this.pc.localDescription)
@@ -183,11 +185,13 @@ class WebRTCCallPair {
             await this.initOutStream()
 
             await this.pc.setRemoteDescription(data)
+
             let answer = await this.pc.createAnswer({
                 offerToReceiveAudio: 1,
                 offerToReceiveVideo: 1
             })
 
+            answer.sdp = sdpTransform(answer.sdp)
 
             await this.pc.setLocalDescription(answer)
 
