@@ -129,7 +129,7 @@ creadential.addEventListener("input", () => {
 class WebRTCCall {
     constructor(id) {
         this.id = id
-        this.ws = new WebSocket(`wss://beo-wsnative.herokuapp.com?id=${id}`)
+        this.ws = new WebSocket(`wss://signals-dot-livestreaming-241004.appspot.com/?id=${id}`)
         this.ws.onmessage = (event) => {
             let [channel, data] = JSON.parse(event.data)
             this.onSocketMessage(channel, data)
