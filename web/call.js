@@ -68,6 +68,7 @@ let turnServerList = document.getElementById('turnServerList');
 let turnServer = document.getElementById('turnServer');
 let username = document.getElementById('username');
 let password = document.getElementById('password');
+let creadential = document.getElementById('creadential');
 
 let turnAccount = {
     urls: [],
@@ -114,6 +115,17 @@ password.addEventListener("input", () => {
     console.log(config.iceServers);
 });
 
+
+creadential.addEventListener("input", () => {
+    let temp = getTURNCredentials(username.value, creadential.value);
+    turnAccount.credential = temp.credential;
+    turnAccount.username = temp.username
+
+    config.iceServers = [];
+    config.iceServers.push(turnAccount);
+
+    console.log(config.iceServers);
+});
 class WebRTCCall {
     constructor(id) {
         this.id = id
