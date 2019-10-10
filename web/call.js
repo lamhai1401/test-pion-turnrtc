@@ -1,12 +1,13 @@
 //@ts-check
-let iceConnectionLog = document.getElementById('ice-connection-state')
-let iceGatheringLog = document.getElementById('ice-gathering-state')
-let id_viewer = document.getElementById('your-id')
-let id_caller = document.getElementById('call-id')
-let signalingLog = document.getElementById('signaling-state')
 
-var id = ((10000) * Math.random() | 0).toString()
-var broadcastId = ""
+let iceConnectionLog = document.getElementById('ice-connection-state');
+let iceGatheringLog = document.getElementById('ice-gathering-state');
+let id_viewer = document.getElementById('your-id');
+let id_caller = document.getElementById('call-id');
+let signalingLog = document.getElementById('signaling-state');
+
+var id = ((10000) * Math.random() | 0).toString();
+var broadcastId = "";
 
 function getTURNCredentials(name, secret) {
 
@@ -20,7 +21,7 @@ function getTURNCredentials(name, secret) {
 
 
 
-id_viewer.textContent += id
+id_viewer.textContent += id;
 
 
 var config = {
@@ -37,6 +38,81 @@ var config = {
         },
     ],
 };
+
+let stunServerList= document.getElementById('stunServerList');
+let stunServer = document.getElementById('turnServer');
+
+stunServerList.addEventListener("change", () => {
+
+    config.iceServers = [
+        {
+            urls: [stunServerList.options[stunServerList.selectedIndex].value]
+        }
+    ];
+
+    console.log(config.iceServers);
+});
+
+stunServer.addEventListener("input", () => {
+
+    config.iceServers = [
+        {
+            urls: [stunServer.value]
+        }
+    ];
+
+    console.log(config.iceServers);
+});
+
+let turnServerList = document.getElementById('turnServerList');
+let turnServer = document.getElementById('turnServer');
+let username = document.getElementById('username');
+let password = document.getElementById('password');
+
+let turnAccount = {
+    urls: [],
+    username: 'test',
+    credential: 'test'
+};
+
+turnServerList.addEventListener("change", () => {
+
+    config.iceServers = [
+        {
+            urls: [turnServerList.options[turnServerList.selectedIndex].value],
+            ...getTURNCredentials("username", "3575819665154b268af59efedee8826e")
+        }
+    ];
+
+    console.log(config.iceServers);
+});
+
+turnServer.addEventListener("input", () => {
+    turnAccount.urls = [turnServer.value];
+
+    config.iceServers = [];
+    config.iceServers.push(turnAccount);
+
+    console.log(config.iceServers);
+});
+
+username.addEventListener("input", () => {
+    turnAccount.username = username.value;
+
+    config.iceServers = [];
+    config.iceServers.push(turnAccount);
+
+    console.log(config.iceServers);
+});
+
+password.addEventListener("input", () => {
+    turnAccount.credential = password.value;
+
+    config.iceServers = [];
+    config.iceServers.push(turnAccount);
+
+    console.log(config.iceServers);
+});
 
 class WebRTCCall {
     constructor(id) {
