@@ -126,10 +126,12 @@ creadential.addEventListener("input", () => {
 
     console.log(config.iceServers);
 });
+
+
 class WebRTCCall {
     constructor(id) {
         this.id = id
-        this.ws = new WebSocket(`wss://signals-dot-livestreaming-241004.appspot.com/?id=${id}`)
+        this.ws = new WebSocket(`ws://localhost:8080/?id=${id}`)
         this.ws.onmessage = (event) => {
             let [channel, data] = JSON.parse(event.data)
             this.onSocketMessage(channel, data)
