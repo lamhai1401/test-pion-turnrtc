@@ -6,6 +6,7 @@ const querystring = require('querystring');
 
 const server = http.createServer();
 const wsSignal = require("./ws-signal")
+const wsGroup = require("./ws-group")
 const PORT = process.env.PORT || 8080
 
 
@@ -14,19 +15,22 @@ server.on('upgrade', function upgrade(request, socket, head) {
   const query = { ...querystring.parse(url.parse(request.url).query) }
 
 
-  if(pathname.endsWith("/"))
-    pathname = pathname.slice(0,-1)
+  if (pathname.endsWith("/"))
+    pathname = pathname.slice(0, -1)
 
-  console.log({pathname})
+  console.log({ pathname })
 
 
-  if(pathname == '' || pathname == "/signal"){
+  if (pathname == '' || pathname == "/signal") {
     console.log("start signal for", query)
     wsSignal.handleUpgrade(request, socket, head, function done(ws) {
       wsSignal.emit('connection', ws, request, { pathname, query });
     });
-  }else if(pathname == 'group'){
-
+  } else if (pathname == '/group' || pathname == '/call-group') {
+    console.log("start group for", query)
+    wsGroup.handleUpgrade(request, socket, head, function done(ws) {
+      wsGroup.emit('connection', ws, request, { pathname, query });
+    });
   }
 });
 
