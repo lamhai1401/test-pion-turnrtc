@@ -1,3 +1,4 @@
+
 //@ts-check
 
 let iceConnectionLog = document.getElementById('ice-connection-state');
@@ -39,7 +40,7 @@ var config = {
     ],
 };
 
-let stunServerList= document.getElementById('stunServerList');
+let stunServerList = document.getElementById('stunServerList');
 let stunServer = document.getElementById('turnServer');
 
 stunServerList.addEventListener("change", () => {
@@ -143,26 +144,44 @@ class WebRTCCall {
         this.call = new Map()
     }
 
-    onSocketMessage(sourceId, data) {
-        console.log("[onSocketMessage]", sourceId, data)
-        if (data.sdp) {
-            if (!this.call.get(sourceId))
-                this.call.set(
-                    sourceId,
-                    new WebRTCCallPair(
-                        { callId: sourceId, initiator: false },
-                        (...data) => {
-                            console.log("send", sourceId, ...data)
-                            this.ws.send(JSON.stringify([sourceId, ...data]))
-                        }
-                    )
+    onIncomingCall(sourceId, data) {
+
+        let accept = confirm(`Accept call from ${sourceId}`)
+
+        if (accept) {
+            this.call.set(
+                sourceId,
+                new WebRTCCallPair(
+                    { callId: sourceId, initiator: false },
+                    (...data) => {
+                        console.log("send", sourceId, ...data)
+                        this.ws.send(JSON.stringify([sourceId, ...data]))
+                    }
                 )
-            console.log("onSocketMessage", this.call.get(sourceId))
-            this.call.get(sourceId).onSDP(data)
-        } else if (data.candidate) {
-            this.call.get(sourceId).onCandidate(data)
+            )
+            this.ws.send(JSON.stringify([sourceId, { response: "accept" }]))
+        } else {
+            this.ws.send(JSON.stringify([sourceId, { response: "reject" }]))
         }
     }
+
+    async onSocketMessage(sourceId, data) {
+        console.log("[onSocketMessage]", sourceId, data)
+        if (data.response) {
+            this.call.has(sourceId) && this.call.get(sourceId).onResponse(data)
+        } else if (data.sdp) {
+            if (!this.call.get(sourceId))
+                await this.onIncomingCall(sourceId, data)
+
+            console.log("onSocketMessage", this.call.get(sourceId))
+
+            this.call.has(sourceId) && this.call.get(sourceId).onSDP(data)
+        } else if (data.candidate) {
+            this.call.has(sourceId) && this.call.get(sourceId).onCandidate(data)
+        }
+
+    }
+
 
     async start(id) {
         this.call.set(
@@ -175,8 +194,11 @@ class WebRTCCall {
                 }
             )
         )
-
-        await this.call.get(id).start()
+        try {
+            await this.call.get(id).start()
+        } catch (error) {
+            this.call.get(id) && this.call.get(id).destroy()            
+        }
     }
 
 
@@ -184,6 +206,7 @@ class WebRTCCall {
 
 class WebRTCCallPair {
     constructor({ callId, initiator }, signal) {
+        this.event = new EventEmitter()
         this.callId = callId
         this.initiator = initiator
         this.pc = new RTCPeerConnection(config)
@@ -249,6 +272,15 @@ class WebRTCCallPair {
         }
     }
 
+    async onResponse(data) {
+        this.event.emit("response", data.response)
+    }
+
+    async destroy(){
+        this.unlock()
+        this.pc.close()
+    }
+
     async start() {
         await this.lock()
         if (this.initiator) {
@@ -265,9 +297,19 @@ class WebRTCCallPair {
             await this.pc.setLocalDescription(offer)
 
             this.signal(this.pc.localDescription)
+
+            let res = await new Promise(
+                rs => this.event.once("response",rs)
+            )
+
+            if(res == 'reject'){
+                alert(`call was rejected`)
+                throw `call was rejected`
+            }
         }
         this.unlock()
     }
+
 
     async onSDP(data) {
         await this.lock()
