@@ -1,23 +1,8 @@
 //@ts-check
-const http = require('http');
 const WebSocket = require('ws');
-const url = require('url');
-const querystring = require('querystring');
 
-const server = http.createServer();
 const wss1 = new WebSocket.Server({ noServer: true });
 
-
-
-server.on('upgrade', function upgrade(request, socket, head) {
-  const pathname = url.parse(request.url).pathname;
-  const query = { ...querystring.parse(url.parse(request.url).query) }
-
-  wss1.handleUpgrade(request, socket, head, function done(ws) {
-    wss1.emit('connection', ws, request, { pathname, query });
-  });
-
-});
 
 
 function handlePingPong(/**@type {WebSocket} */ws) {
@@ -109,4 +94,4 @@ wss1.on(
 
 
 
-server.listen(process.env.PORT || 8080);
+module.exports = wss1
