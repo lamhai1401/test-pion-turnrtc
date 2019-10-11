@@ -156,7 +156,8 @@ class WebRTCCall {
                     (...data) => {
                         console.log("send", sourceId, ...data)
                         this.ws.send(JSON.stringify([sourceId, ...data]))
-                    }
+                    },
+                    () => this.call.delete(sourceId)
                 )
             )
             this.ws.send(JSON.stringify([sourceId, { response: "accept" }]))
@@ -167,7 +168,9 @@ class WebRTCCall {
 
     async onSocketMessage(sourceId, data) {
         console.log("[onSocketMessage]", sourceId, data)
-        if (data.response) {
+        if (data.status) {
+            this.call.has(sourceId) && this.call.get(sourceId).onStatus(data)
+        } else if (data.response) {
             this.call.has(sourceId) && this.call.get(sourceId).onResponse(data)
         } else if (data.sdp) {
             if (!this.call.get(sourceId))
@@ -191,13 +194,15 @@ class WebRTCCall {
                 (...data) => {
                     console.log("send", id, ...data)
                     this.ws.send(JSON.stringify([id, ...data]))
-                }
+                },
+                () => this.call.delete(id)
             )
         )
         try {
             await this.call.get(id).start()
         } catch (error) {
-            this.call.get(id) && this.call.get(id).destroy()            
+            this.call.get(id) && this.call.get(id).destroy()
+            this.call.delete(id)
         }
     }
 
@@ -205,7 +210,7 @@ class WebRTCCall {
 }
 
 class WebRTCCallPair {
-    constructor({ callId, initiator }, signal) {
+    constructor({ callId, initiator }, signal, onDestroy) {
         this.event = new EventEmitter()
         this.callId = callId
         this.initiator = initiator
@@ -219,6 +224,7 @@ class WebRTCCallPair {
             if (event.candidate != null)
                 signal({ candidate: event.candidate })
         }
+        this.event.once("destroy", onDestroy)
     }
 
     initDebug() {
@@ -256,6 +262,13 @@ class WebRTCCallPair {
             // this.inStream.addTrack(ev.track);
         }
         document.body.appendChild(this.videoElement)
+
+        this.closeButton = document.createElement("button")
+        this.closeButton.innerText = `close call ${this.callId}`
+        this.closeButton.onclick = () => {
+            this.close()
+        }
+        document.body.appendChild(this.closeButton)
     }
 
 
@@ -274,11 +287,26 @@ class WebRTCCallPair {
 
     async onResponse(data) {
         this.event.emit("response", data.response)
+        if (data.response == "reject")
+            this.destroy()
+    }
+    async onStatus(data) {
+        this.event.emit("status", data.status)
+        if (data.status == "disconnect" || data.status == "closed")
+            this.destroy()
     }
 
-    async destroy(){
-        this.unlock()
-        this.pc.close()
+
+    async destroy() {
+        if(!this.destroyed){
+            this.unlock()
+            this.pc.close()
+            this.event.emit("destroy")
+            this.event.removeAllListeners()
+            this.closeButton.remove()
+            this.videoElement.remove()
+            this.destroyed = true
+        }
     }
 
     async start() {
@@ -299,10 +327,10 @@ class WebRTCCallPair {
             this.signal(this.pc.localDescription)
 
             let res = await new Promise(
-                rs => this.event.once("response",rs)
+                rs => this.event.once("response", rs)
             )
 
-            if(res == 'reject'){
+            if (res == 'reject') {
                 alert(`call was rejected`)
                 throw `call was rejected`
             }
@@ -353,8 +381,13 @@ class WebRTCCallPair {
         this._wait = new Promise(r => this._resolve = r)
     }
 
-    unlock() {
+    async unlock() {
         this._resolve && this._resolve()
+    }
+
+    async close() {
+        this.signal({ status: "closed" })
+        this.destroy()
     }
 }
 
