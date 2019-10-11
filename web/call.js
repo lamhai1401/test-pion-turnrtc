@@ -132,7 +132,7 @@ creadential.addEventListener("input", () => {
 class WebRTCCall {
     constructor(id) {
         this.id = id
-        this.ws = new WebSocket(`ws://localhost:8080/?id=${id}`)
+        this.ws = new WebSocket(`wss://signals-dot-livestreaming-241004.appspot.com/?id=${id}`)
         this.ws.onmessage = (event) => {
             let [channel, data] = JSON.parse(event.data)
             this.onSocketMessage(channel, data)
@@ -327,8 +327,12 @@ class WebRTCCallPair {
             this.signal(this.pc.localDescription)
 
             let res = await new Promise(
-                rs => this.event.once("response", rs)
+                rs => {
+                    this.event.once("response", rs)
+                    this.event.once("sdp-response",rs)
+                }
             )
+            console.log({res})
 
             if (res == 'reject') {
                 alert(`call was rejected`)
@@ -340,12 +344,14 @@ class WebRTCCallPair {
 
 
     async onSDP(data) {
-        await this.lock()
-
         console.log("onSDP")
         if (this.initiator) {
+            this.event.emit("sdp-response")
+            await this.lock()
             await this.pc.setRemoteDescription(data)
+            this.unlock()
         } else {
+            await this.lock()
             await this.initOutStream()
 
             await this.pc.setRemoteDescription(data)
@@ -360,8 +366,8 @@ class WebRTCCallPair {
             await this.pc.setLocalDescription(answer)
 
             this.signal(this.pc.localDescription)
+            this.unlock()
         }
-        this.unlock()
     }
 
     async onCandidate(data) {
