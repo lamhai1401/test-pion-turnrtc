@@ -294,7 +294,7 @@ class WebRTCCallPair {
             .getUserMedia({
                 audio: true,
                 video: true
-            });
+            }).catch(err => console.error(JSON.stringify(err)));
         for (const track of this.outStream.getTracks()) {
             let rtp = this.pc.addTrack(track, this.outStream);
 
