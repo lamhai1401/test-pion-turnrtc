@@ -1,4 +1,3 @@
-
 //@ts-check
 
 let iceConnectionLog = document.getElementById('ice-connection-state');
@@ -20,8 +19,6 @@ function getTURNCredentials(name, secret) {
     };
 }
 
-
-
 id_viewer.textContent += id;
 
 
@@ -32,16 +29,17 @@ var config = {
     iceServers: [
         {
             urls: ['stun:35.247.173.254']
-        },
-        {
-            urls: ["turn:35.247.173.254"],
-            ...getTURNCredentials("username", "3575819665154b268af59efedee8826e")
-        },
+        }
+        // {
+        //     urls: ["turn:35.247.173.254"],
+        //     ...getTURNCredentials("username", "3575819665154b268af59efedee8826e")
+        // },
     ],
 };
 
 let stunServerList = document.getElementById('stunServerList');
 let stunServer = document.getElementById('turnServer');
+let callrtc = null;
 
 stunServerList.addEventListener("change", () => {
 
@@ -128,13 +126,31 @@ creadential.addEventListener("input", () => {
     console.log(config.iceServers);
 });
 
+let wss_url = "";
+let headers = new Headers();
+
+headers.append('Accept', 'application/json');
+headers.append('Access-Control-Allow-Origin', "*");
+headers.append('Access-Control-Allow-Headers', "*");
+
+fetch("https://testapp-dot-livestreaming-241004.appspot.com/api/config", {
+    method: 'GET',
+    headers: headers,
+})
+.then(resp => resp.json())
+.then(turnConfig => {
+    config.iceServers.push(turnConfig['turnServer']);
+    wss_url = turnConfig['signal'];
+    callrtc = new WebRTCCall(id);
+})
+.catch(err => alert(err));
 
 class WebRTCCall {
     constructor(id) {
         this.id = id
-        this.ws = new WebSocket(`wss://signals-dot-livestreaming-241004.appspot.com/?id=${id}`)
+        this.ws = new WebSocket(`${wss_url}/?id=${id}`);
         this.ws.onmessage = (event) => {
-            let [channel, data] = JSON.parse(event.data)
+            let [channel, data] = JSON.parse(event.data);
             this.onSocketMessage(channel, data)
         }
 
@@ -396,8 +412,6 @@ class WebRTCCallPair {
         this.destroy()
     }
 }
-
-let callrtc = new WebRTCCall(id)
 
 
 function doCall() {
