@@ -21,8 +21,24 @@ function getTURNCredentials(name, secret) {
 
 id_viewer.textContent += id;
 
-
 var config = {
+    sdpSemantics: 'unified-plan',
+    rtcpMuxPolicy: "require",
+    bundlePolicy: "max-bundle",
+    iceServers: [
+        {
+            urls: ['stun:35.247.173.254']
+        }
+        // {
+        //     urls: ["turn:35.247.173.254"],var config = {
+        //     ...getTURNCredentials("username", "3575819665154b268af59efedee8826e")
+        // },
+    ],
+};
+
+let stunServerList = document.getElementById('stunServerList');
+let stunServer = document.getElementById('turnServer');
+let callrtc = null;var config = {
     sdpSemantics: 'unified-plan',
     rtcpMuxPolicy: "require",
     bundlePolicy: "max-bundle",
@@ -36,10 +52,6 @@ var config = {
         // },
     ],
 };
-
-let stunServerList = document.getElementById('stunServerList');
-let stunServer = document.getElementById('turnServer');
-let callrtc = null;
 
 stunServerList.addEventListener("change", () => {
 
@@ -153,10 +165,11 @@ class WebRTCCall {
             let [channel, data] = JSON.parse(event.data);
             this.onSocketMessage(channel, data)
         }
-
-        // setInterval(() => {})
-
-        /**@type {Map<string,WebRTCCallPair>} */
+        /**@type {Map<string,WebRTCCallPairthis.pc.onicecandidate = event => {
+            console.log("candidate", event.candidate);
+            if (event.candidate != null)
+                signal({ candidate: event.candidate })
+        }>} */
         this.call = new Map()
     }
 
@@ -179,6 +192,10 @@ class WebRTCCall {
             this.ws.send(JSON.stringify([sourceId, { response: "accept" }]))
         } else {
             this.ws.send(JSON.stringify([sourceId, { response: "reject" }]))
+        }this.pc.onicecandidate = event => {
+            console.log("candidate", event.candidate);
+            if (event.candidate != null)
+                signal({ candidate: event.candidate })
         }
     }
 
@@ -259,7 +276,7 @@ class WebRTCCallPair {
             console.log("[WebRTCCall] signalingstatechange", this.callId, this.pc.signalingState)
         }, false);
     }
-
+    pc.setRemoteDescription(data)
     initInStream() {
         this.videoElement = document.createElement("video")
         this.videoElement.id = "call-" + this.callId
@@ -279,7 +296,7 @@ class WebRTCCallPair {
         }
         document.body.appendChild(this.videoElement)
 
-        this.closeButton = document.createElement("button")
+        this.closeButton = document.createElement("buttonpc.setRemoteDescription(data))
         this.closeButton.innerText = `close call ${this.callId}`
         this.closeButton.onclick = () => {
             this.close()
@@ -321,7 +338,20 @@ class WebRTCCallPair {
             this.event.removeAllListeners()
             this.closeButton.remove()
             this.videoElement.remove()
-            this.destroyed = true
+            this.destroyed = truevar config = {
+                sdpSemantics: 'unified-plan',
+                rtcpMuxPolicy: "require",
+                bundlePolicy: "max-bundle",
+                iceServers: [
+                    {
+                        urls: ['stun:35.247.173.254']
+                    }
+                    // {
+                    //     urls: ["turn:35.247.173.254"],
+                    //     ...getTURNCredentials("username", "3575819665154b268af59efedee8826e")
+                    // },
+                ],
+            };
         }
     }
 

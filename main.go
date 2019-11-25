@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"log"
 	"net/http"
 	"github.com/pion/stun"
 	"github.com/gorilla/mux"
@@ -58,6 +59,6 @@ func main()  {
 		}
 	}()
 
-	// log.Println("Serving at localhost:8000...")
+	log.Println("Serving at localhost:8088...")
 	select {}
 }
